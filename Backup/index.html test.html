@@ -1,0 +1,323 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Laser Bucket Height Tool</title>
+  <style>
+    html {
+      font-family: Arial;
+      display: inline-block;
+      margin: 0px auto;
+      text-align: center;
+    }
+    
+    h2 {
+      font-size: 3.0rem;
+    }
+    
+    p {
+      font-size: 3.0rem;
+    }
+    
+    .units {
+      font-size: 1.2rem;
+    }
+    
+    .sensor-labels {
+      font-size: 1.5rem;
+      vertical-align: middle;
+      padding-bottom: 15px;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #008CBA;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      padding: 16px 40px;
+      text-decoration: none;
+      font-size: 30px;
+      margin: 2px;
+      cursor: pointer;
+    }
+    
+    #zero {
+      background-color: green;
+    }
+    
+    #reset {
+      background-color: red;
+    }
+
+    .center-table {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .table {
+        margin: 0 auto;
+    }
+
+    #recordData,
+    #btnExportToCsv {
+    padding: 10px 20px; /* Adjust the padding values as desired */
+    font-size: 20px; /* Adjust the font size as desired */
+  }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://kit.fontawesome.com/a30daafdec.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <h2>Laser Bucket Height Tool</h2>
+  <p>
+    <i class="fa-solid fa-ruler-vertical" style="color: #f5e609;"></i>
+    <span class="sensor-labels">Distance 1: </span>
+    <span id="distance1">%DISTANCE1%</span>
+    <span class="units"> mm</span>
+  </p>
+  <p>
+    <i class="fa-solid fa-ruler-vertical" style="color: #f5e609;"></i>
+    <span class="sensor-labels">Distance 2: </span>
+    <span id="distance2">%DISTANCE2%</span>
+    <span class="units"> mm</span>
+  </p>
+  <p>
+    <i class="fa-solid fa-minus" style="color: #f5e609;"></i>
+    <span class="sensor-labels">Offset 1: </span>
+    <span id="offset1">%OFFSET1%</span>
+    <span class="units"> mm</span>
+  </p>
+  <p>
+    <i class="fa-solid fa-minus" style="color: #f5e609;"></i>
+    <span class="sensor-labels">Offset 2: </span>
+    <span id="offset2">%OFFSET2%</span>
+    <span class="units"> mm</span>
+  </p>
+  <label><input class="button" type="button" value="Zero" onclick="zero()" id="zero"></label>
+  <label><input class="button" type="button" value="Reset" onclick="reset()" id="reset"></label>
+  <div id="error" style="display: none;">
+    <p>
+      <i class="fa-solid fa-triangle-exclamation" style="color: red;"></i>
+      <span class="sensor-labels">Not connected to sensor!</span>
+    </p>
+  </div>
+
+  <br></br>
+  <label for="dispensestation">Dispense Station:</label>
+    <select name="dispensestation" id="dispensestation">
+        <option value="IW1">IW1</option>
+        <option value="IW2">IW2</option>
+        <option value="DB1">DB1</option>
+        <option value="DB2">DB2</option>
+        <option value="DB3">DB3</option>
+        <option value="PBW1">PBW1</option>
+        <option value="PBW2">PBW2</option>
+        <option value="PBW3">PBW3</option>
+        <option value="ActsMods1">ActsMods1</option>
+        <option value="Bases1">Bases1</option>
+        <option value="ActsMods2">ActsMods2</option>
+        <option value="Bases2">Bases2</option>
+        <option value="Cap1">Cap1</option>
+        <option value="Oxidizer">Oxidizer</option>
+        <option value="Cap2">Cap2</option>
+    </select>
+    <br></br>
+    <button id="recordData" type="button" class="button" onclick="recordData()">Record Station</button>
+    <button id="btnExportToCsv" type="button" class="button">Export to CSV</button>
+
+    <table id="dataTable" class="table">
+        <thead>
+            <tr>
+                <th>Dispense Tower</th>
+                <th>Inner Dial Measurement (mm)</th>
+                <th>Outer Dial Measurement (mm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>IW1</td>
+                <td id="IW1_inner">IW1_innerDial</td>
+                <td id="IW1_outer">IW1_outerDial</td>
+            </tr>
+            <tr>
+                <td>IW2</td>
+                <td id="IW2_inner">IW2_innerDial</td>
+                <td id="IW2_outer">IW2_outerDial</td>
+            </tr>
+            <tr>
+                <td>DB1</td>
+                <td id="DB1_inner">DB1_innerDial</td>
+                <td id="DB1_outer">DB1_outerDial</td>
+            </tr>
+            <tr>
+                <td>DB2</td>
+                <td id="DB2_inner">DB2_innerDial</td>
+                <td id="DB2_outer">DB2_outerDial</td>
+            </tr>
+            <tr>
+                <td>DB3</td>
+                <td id="DB3_inner">DB3_innerDial</td>
+                <td id="DB3_outer">DB3_outerDial</td>
+            </tr>
+            <tr>
+                <td>PBW1</td>
+                <td id="PBW1_inner">PBW1_innerDial</td>
+                <td id="PBW1_outer">PBW1_outerDial</td>
+            </tr>
+            <tr>
+                <td>PBW2</td>
+                <td id="PBW2_inner">PBW2_innerDial</td>
+                <td id="PBW2_outer">PBW2_outerDial</td>
+            </tr>
+            <tr>
+                <td>PBW3</td>
+                <td id="PBW3_inner">PBW3_innerDial</td>
+                <td id="PBW3_outer">PBW3_outerDial</td>
+            </tr>
+            <tr>
+                <td>ActsMods1</td>
+                <td id="ActsMods1_inner">ActsMods1_innerDial</td>
+                <td id="ActsMods1_outer">ActsMods1_outerDial</td>
+            </tr>
+            <tr>
+                <td>Bases1</td>
+                <td id="Bases1_inner">Bases1_innerDial</td>
+                <td id="Bases1_outer">Bases1_outerDial</td>
+            </tr>
+            <tr>
+                <td>ActsMods2</td>
+                <td id="ActsMods2_inner">ActsMods2_innerDial</td>
+                <td id="ActsMods2_outer">ActsMods2_outerDial</td>
+            </tr>
+            <tr>
+                <td>Bases2</td>
+                <td id="Bases2_inner">Bases2_innerDial</td>
+                <td id="Bases2_outer">Bases2_outerDial</td>
+            </tr>
+            <tr>
+                <td>Cap1</td>
+                <td id="Cap1_inner">Cap1_innerDial</td>
+                <td id="Cap1_outer">Cap1_outerDial</td>
+            </tr>
+            <tr>
+                <td>Oxidizer</td>
+                <td id="Oxidizer_inner">Oxidizer_innerDial</td>
+                <td id="Oxidizer_outer">Oxidizer_outerDial</td>
+            </tr>
+            <tr>
+                <td>Cap2</td>
+                <td id="Cap2_inner">Cap2_innerDial</td>
+                <td id="Cap2_outer">Cap2_outerDial</td>
+            </tr>
+        </tbody>
+    </table>
+
+  <script>
+    var distance1 = 0;
+    var distance2 = 0;
+    var offset1 = 0;
+    var offset2 = 0;
+
+    setInterval(function () {
+      var xhttp1 = new XMLHttpRequest();
+      xhttp1.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          distance1 = parseFloat(this.responseText);
+          document.getElementById("distance1").innerHTML = (distance1 - offset1).toFixed(0);
+          console.log("distance1", this.responseText);
+          document.getElementById('error').style.display = 'none';
+        }
+      };
+
+      xhttp1.open("GET", "/distance1", true);
+      xhttp1.onerror = function () {
+        console.log("*** Not connected to sensor 1! ***");
+        document.getElementById('error').style.display = 'block';
+      };
+      xhttp1.send();
+
+      var xhttp2 = new XMLHttpRequest();
+      xhttp2.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          distance2 = parseFloat(this.responseText);
+          document.getElementById("distance2").innerHTML = (distance2 - offset2).toFixed(0);
+          console.log("distance2", this.responseText);
+          document.getElementById('error').style.display = 'none';
+        }
+      };
+
+      xhttp2.open("GET", "/distance2", true);
+      xhttp2.onerror = function () {
+        console.log("*** Not connected to sensor 2! ***");
+        document.getElementById('error').style.display = 'block';
+      };
+      xhttp2.send();
+    }, 100);
+
+    function zero() {
+      offset1 = distance1;
+      offset2 = distance2;
+      document.getElementById("offset1").innerHTML = offset1.toFixed(0);
+      document.getElementById("offset2").innerHTML = offset2.toFixed(0);
+      console.log("offset1", offset1);
+      console.log("offset2", offset2);
+    }
+
+    function reset() {
+      offset1 = 0;
+      offset2 = 0;
+      document.getElementById("offset1").innerHTML = offset1.toFixed(0);
+      document.getElementById("offset2").innerHTML = offset2.toFixed(0);
+      console.log("offset1", offset1);
+      console.log("offset2", offset2);
+    }
+
+    function recordData() {
+        var dispenseStation = document.getElementById("dispensestation").value;
+        var innerDial = (distance1 - offset1).toFixed(0);
+        var innerDialMeasurement = (distance1 - offset1).toFixed(0);
+        var outerDial = (distance2 - offset2).toFixed(0);
+        var outerDialMeasurement = (distance2 - offset2).toFixed(0);
+        var innerCellID = dispenseStation + "_inner";
+        document.getElementById(dispenseStation + "_inner").innerHTML = innerDialMeasurement;
+        var outerCellID = dispenseStation + "_outer";
+        document.getElementById(dispenseStation + "_outer").innerHTML = outerDialMeasurement;
+
+        document.getElementById(innerCellID).innerHTML = innerDial;
+        document.getElementById(outerCellID).innerHTML = outerDial;
+    }
+
+    function downloadCSV(csv, filename) {
+      var csvFile;
+      var downloadLink;
+      csvFile = new Blob([csv], { type: "text/csv" });
+      downloadLink = document.createElement("a");
+      downloadLink.download = filename;
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    }
+
+    document.getElementById("btnExportToCsv").addEventListener("click", function () {
+      var csv = [];
+      var rows = document.querySelectorAll("table tr");
+      for (var i = 0; i < rows.length; i++) {
+        var row = [];
+        var cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) {
+          row.push(cols[j].innerText);
+        }
+        csv.push(row.join(","));
+      }
+      var filename = "bucket_height_data.csv";
+      downloadCSV(csv.join("\n"), filename);
+    });
+  </script>
+</body>
+</html>

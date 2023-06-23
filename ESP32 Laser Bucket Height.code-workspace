@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../Test Project"
+		},
+		{
+			"path": "."
+		},
+		{
+			"name": "littlefs test",
+			"path": "../littlefs test"
+		}
+	],
+	"settings": {}
+}

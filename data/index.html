@@ -1,0 +1,32 @@
+<!DOCTYPE HTML><html>
+  <title>Laser Bucket Height Tool</title>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://kit.fontawesome.com/a30daafdec.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <h2>Chuck Height Sensor</h2>
+  <p>
+    <i class="fa-solid fa-ruler-vertical" style="color: #f5e609;"></i> 
+    <span class="sensor-labels">Distance</span> 
+    <span id="distance">%DISTANCE%</span>
+    <span class="units"> in</span>
+  </p>
+  <p>
+    <i class="fa-solid fa-minus" style="color: #f5e609;"></i> 
+    <span class="sensor-labels">Offset</span> 
+    <span id="offset">%OFFSET%</span>
+    <span class="units"> in</span>
+  </p>
+  <label><input class = "button" type="button" value="Zero" onclick="zero()" id="zero"></label>
+  <label><input class = "button" type="button" value="Reset" onclick="reset()" id="reset"></label>
+  <div id="error" style="display: none;">
+  <p>
+    <i class="fa-solid fa-triangle-exclamation" style="color: red;"></i>
+    <span class="sensor-labels">Not connected to sensor!</span>
+  </p>
+</div>
+<script src="script.js"></script>
+</html>
